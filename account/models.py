@@ -22,6 +22,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to="images/", blank=True, null=True)
     pub_date = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
+    comments = models.ManyToManyField("Comment", related_name="posts", blank=True)
 
 
 class Reaction(models.Model):
@@ -44,6 +45,5 @@ class Comment(models.Model):
     author = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="comments"
     )
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

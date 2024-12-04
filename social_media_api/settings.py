@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "account",
     "user",
     "taggit",
+    "rest_framework",
 ]
 
 TAGGIT_CASE_INSENSITIVE = True

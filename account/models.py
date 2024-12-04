@@ -14,6 +14,12 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
     following = models.ManyToManyField("Profile", related_name="followers", blank=True)
 
+    class Meta:
+        ordering = ("last_name",)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
@@ -23,6 +29,12 @@ class Post(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
     comments = models.ManyToManyField("Comment", related_name="posts", blank=True)
+
+    class Meta:
+        ordering = ("-pub_date",)
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
 
 
 class Reaction(models.Model):
@@ -47,3 +59,9 @@ class Comment(models.Model):
     )
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("author",)
+
+    def __str__(self):
+        return f"{self.author}"

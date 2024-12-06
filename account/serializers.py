@@ -15,7 +15,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             "bio",
             "following",
         )
-        read_only_fields = ("id", "following")
 
 
 class FollowerSerializer(serializers.ModelSerializer):
@@ -25,6 +24,7 @@ class FollowerSerializer(serializers.ModelSerializer):
 
 
 class ProfileListSerializer(ProfileSerializer):
+    following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
 
     class Meta:

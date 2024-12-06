@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from account.models import Profile, Post, Reaction, Comment
-from user.serializers import UserSerializer
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -19,9 +18,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "following")
 
 
+class FollowerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ("id", "first_name", "last_name")
+
+
 class ProfileListSerializer(ProfileSerializer):
-    user = UserSerializer(read_only=True)
-    followers = serializers.CharField(source="profile.followers", read_only=True)
+    followers = FollowerSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profile
@@ -36,6 +40,23 @@ class ProfileListSerializer(ProfileSerializer):
             "followers",
         )
         read_only_fields = ("id", "user", "image", "following", "followers")
+
+
+class ProfileRetrieveSerializer(ProfileSerializer):
+    following = FollowerSerializer(many=True, read_only=False)
+    followers = FollowerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            "first_name",
+            "last_name",
+            "image",
+            "bio",
+            "following",
+            "followers",
+        )
+        read_only_fields = ("id", "user", "followers")
 
 
 class PostSerializer(serializers.ModelSerializer):

@@ -1,7 +1,29 @@
+import os
+import uuid
+
 from django.db import models
+from django.utils.text import slugify
 
 from social_media_api.settings import AUTH_USER_MODEL
 from taggit.managers import TaggableManager
+
+
+def image_custom_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+
+    if isinstance(instance, Profile):
+        folder = "profile"
+    elif isinstance(instance, Post):
+        folder = "post"
+    else:
+        folder = "other"
+
+    return os.path.join(
+        "upload",
+        folder,
+        "images",
+        f"{slugify(instance.user)}-{uuid.uuid4()}{extension}",
+    )
 
 
 class Profile(models.Model):
@@ -10,7 +32,7 @@ class Profile(models.Model):
     )
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image = models.ImageField(upload_to=image_custom_path, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     following = models.ManyToManyField("Profile", related_name="followers", blank=True)
 
@@ -25,7 +47,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="posts")
     description = models.TextField()
-    image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image = models.ImageField(upload_to=image_custom_path, blank=True, null=True)
     pub_date = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
     comments = models.ManyToManyField("Comment", related_name="posts", blank=True)

@@ -1,12 +1,23 @@
 from rest_framework import viewsets
 
 from account.models import Profile, Post, Comment
-from account.serializers import ProfileSerializer, PostSerializer, CommentSerializer
+from account.serializers import (
+    ProfileSerializer,
+    PostSerializer,
+    CommentSerializer,
+    ProfileListSerializer,
+)
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ProfileListSerializer
+
+        return ProfileSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):

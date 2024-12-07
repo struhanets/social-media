@@ -13,17 +13,20 @@ def image_custom_path(instance, filename):
 
     if isinstance(instance, Profile):
         folder = "profile"
-    elif isinstance(instance, Post):
+        return os.path.join(
+            "upload",
+            folder,
+            "images",
+            f"{slugify(instance.last_name)}-{uuid.uuid4()}{extension}",
+        )
+    if isinstance(instance, Post):
         folder = "post"
-    else:
-        folder = "other"
-
-    return os.path.join(
-        "upload",
-        folder,
-        "images",
-        f"{slugify(instance.user)}-{uuid.uuid4()}{extension}",
-    )
+        return os.path.join(
+            "upload",
+            folder,
+            "images",
+            f"{slugify(instance.title)}-{uuid.uuid4()}{extension}",
+        )
 
 
 class Profile(models.Model):

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from account.models import Profile, Post, Reaction, Comment
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -59,7 +60,9 @@ class ProfileRetrieveSerializer(ProfileSerializer):
         read_only_fields = ("id", "user", "followers")
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+
     class Meta:
         model = Post
         fields = (
@@ -72,6 +75,15 @@ class PostSerializer(serializers.ModelSerializer):
             "tags",
             "comments",
         )
+        read_only_fields = ("id", "pub_date", "comments")
+
+
+class PostListSerializer(serializers.ModelSerializer):
+    pass
+
+
+class PostRetrieveSerializer(serializers.ModelSerializer):
+    pass
 
 
 class ReactionSerializer(serializers.ModelSerializer):

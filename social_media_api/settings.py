@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "taggit",
     "rest_framework",
     "debug_toolbar",
+    "rest_framework.authtoken",
 ]
 
 TAGGIT_CASE_INSENSITIVE = True

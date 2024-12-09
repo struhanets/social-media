@@ -60,6 +60,22 @@ class ProfileRetrieveSerializer(ProfileSerializer):
         read_only_fields = ("id", "user", "followers")
 
 
+class ReactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reaction
+        fields = (
+            "id",
+            "user",
+            "post",
+            "reaction_type",
+        )
+
+
+class ReactionListSerializer(ReactionSerializer):
+    user = serializers.SlugRelatedField(slug_field="last_name", read_only=True)
+    post = serializers.SlugRelatedField(slug_field="title", read_only=True)
+
+
 class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
 
@@ -78,23 +94,19 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
         read_only_fields = ("id", "pub_date", "comments")
 
 
-class PostListSerializer(serializers.ModelSerializer):
-    pass
-
-
 class PostRetrieveSerializer(serializers.ModelSerializer):
-    pass
-
-
-class ReactionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Reaction
+        model = Post
         fields = (
             "id",
-            "user",
-            "post",
-            "reaction_type",
+            "title",
+            "author",
+            "description",
+            "image",
+            "pub_date",
+            "comments",
         )
+        read_only_fields = ("id", "pub_date", "comments")
 
 
 class CommentSerializer(serializers.ModelSerializer):

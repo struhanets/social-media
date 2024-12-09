@@ -94,6 +94,10 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
         read_only_fields = ("id", "pub_date", "comments")
 
 
+class PostListSerializer(PostSerializer):
+    author = serializers.SlugRelatedField(slug_field="first_name", read_only=True)
+
+
 class PostRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post

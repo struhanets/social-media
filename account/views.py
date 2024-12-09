@@ -1,4 +1,6 @@
+from django.db.models import Q
 from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -13,12 +15,14 @@ from account.serializers import (
     PostRetrieveSerializer,
     ReactionSerializer,
     ReactionListSerializer,
+    PostListSerializer,
 )
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileListSerializer
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
@@ -48,6 +52,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class ReactionViewSet(viewsets.ModelViewSet):
     serializer_class = ReactionSerializer
     permission_classes = (IsOwnerOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return Reaction.objects.filter(user=self.request.user.profile)
@@ -87,15 +92,30 @@ class ReactionViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsOwnerOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return PostListSerializer
         if self.action == "retrieve":
             return PostRetrieveSerializer
 
         return PostSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset
+        profile = self.request.user.profile
+        following = profile.following.all()
+        if self.action == "list":
+            return queryset.filter(
+                Q(author=profile) | Q(author__in=following)
+            ).prefetch_related("author__user__profile", "comments")
+
+        return queryset
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    authentication_classes = (TokenAuthentication,)

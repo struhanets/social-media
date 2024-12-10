@@ -108,9 +108,15 @@ class PostViewSet(viewsets.ModelViewSet):
         profile = self.request.user.profile
         following = profile.following.all()
         if self.action == "list":
-            return queryset.filter(
+            queryset = queryset.filter(
                 Q(author=profile) | Q(author__in=following)
             ).prefetch_related("author__user__profile", "comments")
+
+            hash_tags = self.request.query_params.get("tags")
+            if hash_tags:
+                return queryset.filter(tags__name__icontains=hash_tags)
+
+            return queryset
 
         return queryset
 

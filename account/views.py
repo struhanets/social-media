@@ -16,6 +16,7 @@ from account.serializers import (
     ReactionSerializer,
     ReactionListSerializer,
     PostListSerializer,
+    CommentCreateSerializer,
 )
 
 
@@ -92,7 +93,7 @@ class ReactionViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
     def get_serializer_class(self):
@@ -116,12 +117,27 @@ class PostViewSet(viewsets.ModelViewSet):
             if hash_tags:
                 return queryset.filter(tags__name__icontains=hash_tags)
 
-            return queryset
-
         return queryset
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance.author != request.user.profile:
+            return Response(
+                {"detail": "You don't have permission to update this post"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return super().update(request, *args, **kwargs)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     authentication_classes = (TokenAuthentication,)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CommentCreateSerializer
+
+        return CommentSerializer

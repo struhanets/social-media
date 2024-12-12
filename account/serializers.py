@@ -89,16 +89,19 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
             "image",
             "pub_date",
             "tags",
+        )
+        read_only_fields = (
+            "id",
+            "pub_date",
             "comments",
         )
-        read_only_fields = ("id", "pub_date", "comments")
 
 
 class PostListSerializer(PostSerializer):
     author = serializers.SlugRelatedField(slug_field="first_name", read_only=True)
 
 
-class PostRetrieveSerializer(serializers.ModelSerializer):
+class PostRetrieveSerializer(PostSerializer):
     class Meta:
         model = Post
         fields = (
@@ -107,18 +110,46 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
             "author",
             "description",
             "image",
-            "pub_date",
             "comments",
+            "pub_date",
         )
-        read_only_fields = ("id", "pub_date", "comments")
+        read_only_fields = (
+            "id",
+            "author",
+            "comments",
+            "pub_date",
+        )
+
+
+class PostTitleSerializer(PostSerializer):
+    class Meta:
+        model = Post
+        fields = ("id", "title")
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    post = PostListSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = (
             "id",
             "author",
             "description",
+            "post",
             "created_at",
         )
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    post = serializers.PrimaryKeyRelatedField(
+        queryset=Post.objects.all(), source="posts"
+    )
+
+    class Meta:
+        model = Comment
+        fields = ("author", "post", "description")
+
+    def create(self, validated_data):
+        # Створення коментаря з вибраним постом
+        return Comment.objects.create(**validated_data)

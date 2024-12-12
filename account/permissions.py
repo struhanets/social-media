@@ -6,6 +6,9 @@ class IsOwnerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
+        if hasattr(obj, "author"):  # Якщо об'єкт має поле `author`
+            return obj.author == request.user.profile
+
         if hasattr(obj, "user"):  # Якщо об'єкт напряму має поле `user`
             return obj.user == request.user
 

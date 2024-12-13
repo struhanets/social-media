@@ -53,7 +53,6 @@ class Post(models.Model):
     image = models.ImageField(upload_to=image_custom_path, blank=True, null=True)
     pub_date = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager()
-    comments = models.ManyToManyField("Comment", related_name="posts", blank=True)
 
     class Meta:
         ordering = ("-pub_date",)
@@ -81,6 +80,9 @@ class Reaction(models.Model):
 class Comment(models.Model):
     author = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="comments"
+    )
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="post_comments"
     )
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

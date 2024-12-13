@@ -27,6 +27,7 @@ class FollowerSerializer(serializers.ModelSerializer):
 class ProfileListSerializer(ProfileSerializer):
     following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
+    user = serializers.SlugRelatedField(read_only=True, slug_field="email")
 
     class Meta:
         model = Profile
@@ -73,11 +74,25 @@ class ReactionSerializer(serializers.ModelSerializer):
 
 class ReactionListSerializer(ReactionSerializer):
     user = serializers.SlugRelatedField(slug_field="last_name", read_only=True)
-    post = serializers.SlugRelatedField(slug_field="title", read_only=True)
+    post = serializers.SlugRelatedField(slug_field="title", read_only=True, many=True)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "author",
+            "post",
+            "description",
+            "created_at",
+        )
+        read_only_fields = ("id", "created_at")
 
 
 class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
@@ -89,6 +104,7 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
             "image",
             "pub_date",
             "tags",
+            "comments",
         )
         read_only_fields = (
             "id",
@@ -125,31 +141,3 @@ class PostTitleSerializer(PostSerializer):
     class Meta:
         model = Post
         fields = ("id", "title")
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    post = PostListSerializer(read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = (
-            "id",
-            "author",
-            "description",
-            "post",
-            "created_at",
-        )
-
-
-class CommentCreateSerializer(serializers.ModelSerializer):
-    post = serializers.PrimaryKeyRelatedField(
-        queryset=Post.objects.all(), source="posts"
-    )
-
-    class Meta:
-        model = Comment
-        fields = ("author", "post", "description")
-
-    def create(self, validated_data):
-        # Створення коментаря з вибраним постом
-        return Comment.objects.create(**validated_data)

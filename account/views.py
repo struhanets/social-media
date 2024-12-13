@@ -16,7 +16,6 @@ from account.serializers import (
     ReactionSerializer,
     ReactionListSerializer,
     PostListSerializer,
-    CommentCreateSerializer,
 )
 
 
@@ -93,7 +92,7 @@ class ReactionViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
+    permission_classes = (IsOwnerOrReadOnly,)
     authentication_classes = (TokenAuthentication,)
 
     def get_serializer_class(self):
@@ -111,7 +110,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             queryset = queryset.filter(
                 Q(author=profile) | Q(author__in=following)
-            ).prefetch_related("author__user__profile", "comments")
+            ).prefetch_related("author__user__profile")
 
             hash_tags = self.request.query_params.get("tags")
             if hash_tags:
@@ -135,9 +134,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     authentication_classes = (TokenAuthentication,)
-
-    def get_serializer_class(self):
-        if self.action == "create":
-            return CommentCreateSerializer
-
-        return CommentSerializer
+    permission_classes = (
+        IsOwnerOrReadOnly,
+        IsAuthenticated,
+    )

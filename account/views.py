@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from account.models import Profile, Post, Comment, Reaction
 from account.permissions import IsOwnerOrReadOnly
@@ -19,6 +20,12 @@ from account.serializers import (
 )
 
 
+@extend_schema(
+    tags=["Profile"],
+    description="Endpoint for managing user profiles. "
+    "Allows authenticated users to retrieve or "
+    "update their profile information.",
+)
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileListSerializer
@@ -48,7 +55,30 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="last_name",
+                type={"type": "string"},
+                description="filtered by user's last name, ex. (?last_name=struhanets)",
+            ),
+            OpenApiParameter(
+                name="first_name",
+                type={"type": "string"},
+                description="filtered by user's first name, ex. (?first_name=volodymyr)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
+
+@extend_schema(
+    tags=["Reaction"],
+    description="Endpoint for creating and managing reactions to posts. "
+    "Allows authenticated users to like or dislike posts and "
+    "retrieve existing reactions.",
+)
 class ReactionViewSet(viewsets.ModelViewSet):
     serializer_class = ReactionSerializer
     permission_classes = (IsOwnerOrReadOnly,)
@@ -89,6 +119,12 @@ class ReactionViewSet(viewsets.ModelViewSet):
         return ReactionSerializer
 
 
+@extend_schema(
+    tags=["Post"],
+    description="Endpoint for creating, retrieving, updating, "
+    "and deleting posts. Allows authenticated users to "
+    "manage their posts.",
+)
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -129,7 +165,25 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="tags",
+                type={"type": "array", "items": {"type": "string"}},
+                description="filtered by tags, ex.(?tags=text)",
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
+
+@extend_schema(
+    tags=["Comment"],
+    description="Endpoint for creating, retrieving, "
+    "updating, and deleting comments. "
+    "Allows users to interact with comments on posts.",
+)
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer

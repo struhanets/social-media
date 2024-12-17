@@ -28,9 +28,12 @@ from account.serializers import (
 )
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileListSerializer
+    serializer_class = ProfileSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (
+        IsAuthenticated,
+        IsOwnerOrReadOnly,
+    )
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -43,15 +46,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
 
-        last_name = self.request.query_params.get("last_name")
-        first_name = self.request.query_params.get("first_name")
-        if last_name:
-            return queryset.filter(last_name__icontains=last_name)
-        elif first_name:
-            return queryset.filter(first_name__icontains=first_name)
-
         if self.action == "list":
-            queryset = queryset.select_related()
+            last_name = self.request.query_params.get("last_name")
+            first_name = self.request.query_params.get("first_name")
+            if last_name:
+                return queryset.filter(last_name__icontains=last_name)
+            elif first_name:
+                return queryset.filter(first_name__icontains=first_name)
+            return queryset.all()
+
+        if self.action == "retrieve":
+            return queryset.filter(user=self.request.user)
 
         return queryset
 
@@ -128,7 +133,7 @@ class ReactionViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
     def get_serializer_class(self):
@@ -143,6 +148,7 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         profile = self.request.user.profile
         following = profile.following.all()
+
         if self.action == "list":
             queryset = queryset.filter(
                 Q(author=profile) | Q(author__in=following)
@@ -151,7 +157,6 @@ class PostViewSet(viewsets.ModelViewSet):
             hash_tags = self.request.query_params.get("tags")
             if hash_tags:
                 return queryset.filter(tags__name__icontains=hash_tags)
-
         return queryset
 
     def update(self, request, *args, **kwargs):

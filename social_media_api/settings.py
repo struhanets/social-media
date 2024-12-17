@@ -137,15 +137,16 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 2,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Social Media Project API",
-    "DESCRIPTION": "Users can create and manage own profile, following another accounts, create and manage posts and comments.",
+    "DESCRIPTION": "Users can create and manage own profile,"
+    "following another accounts, create and "
+    "manage posts and comments.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }

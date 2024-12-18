@@ -40,17 +40,23 @@ class PostAuthTests(TestCase):
         )
 
     def test_post_list(self):
-        post = {
-            "title": "Sample Title",
-            "author": self.profile,
-            "description": "Sample Description",
-        }
+        post1 = Post.objects.create(
+            title="Sample Title",
+            author=self.profile,
+            description="Sample Description",
+        )
+        post2 = Post.objects.create(
+            title="Sample Title 2",
+            author=self.profile,
+            description="Sample Description 2",
+        )
         response = self.client.get(POST_URL)
 
         posts = Post.objects.all()
         serializer = PostListSerializer(posts, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), posts.count())
         self.assertEqual(response.data["results"], serializer.data)
 
     def test_post_following_list(self):

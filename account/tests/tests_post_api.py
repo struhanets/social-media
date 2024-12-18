@@ -110,10 +110,35 @@ class PostAuthTests(TestCase):
         post2.tags.add("test1", "test2")
 
         response = self.client.get(POST_URL, {"tags": "tag1"})
+
         serializer1 = PostListSerializer(post1)
         serializer2 = PostListSerializer(post2)
-        posts = Post.objects.all()
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
         self.assertNotIn(serializer2.data, response.data["results"])
         self.assertIn(serializer1.data, response.data["results"])
+
+    def test_create_post(self):
+        profile = Profile.objects.get(
+            user=self.user1,
+        )
+
+        payload = {
+            "title": "Sample Title",
+            "author": profile.id,
+            "description": "Default Text",
+            "tags": ["tag1", "tag2"],
+        }
+        response = self.client.post(POST_URL, payload)
+
+        post = Post.objects.get(id=response.data["id"])
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        for key in payload.keys():
+            if key == "author":
+                self.assertEqual(payload[key], post.author.id)
+            elif key == "tags":
+                self.assertEqual(set(payload[key]), set(post.tags.names()))
+            else:
+                self.assertEqual(payload[key], getattr(post, key))

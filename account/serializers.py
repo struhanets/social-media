@@ -74,7 +74,7 @@ class ReactionSerializer(serializers.ModelSerializer):
 
 class ReactionListSerializer(ReactionSerializer):
     user = serializers.SlugRelatedField(slug_field="last_name", read_only=True)
-    post = serializers.SlugRelatedField(slug_field="title", read_only=True, many=True)
+    post = serializers.SlugRelatedField(slug_field="title", read_only=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):

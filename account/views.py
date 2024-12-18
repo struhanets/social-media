@@ -86,7 +86,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 )
 class ReactionViewSet(viewsets.ModelViewSet):
     serializer_class = ReactionSerializer
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):

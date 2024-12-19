@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from account.models import Profile, Reaction, Post
-from account.serializers import ReactionSerializer, ReactionListSerializer
+from account.serializers import ReactionListSerializer
 
 REACTION_URL = reverse("account:reaction-list")
 

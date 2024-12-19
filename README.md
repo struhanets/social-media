@@ -1,54 +1,109 @@
 # Social Media API
+This project is a backend API for a social media platform that supports user registration, 
+authentication, profile management, following/unfollowing, post creation, 
+and interactions such as likes and comments. Below is a detailed breakdown of the features 
+and the development process.
 
-### Requirements
-## User Registration and Authentication:
-1. Users should be able to register with their email and password to create an account.
-2. Users should be able to login with their credentials and receive a token for authentication.
-3. Users should be able to logout and invalidate their token.
+## Features Implemented
 
-### User Profile:
-1. Users should be able to create and update their profile, including profile picture, bio, and other details.
-2. Users should be able to retrieve their own profile and view profiles of other users.
-3. Users should be able to search for users by username or other criteria
+### 1. **User Registration and Authentication**
+- **Registration:** Users can register an account by providing their email and password. Validation ensures unique emails and strong passwords.
+- **Login:** Users can log in with their credentials to receive an authentication token.
 
-### Follow/Unfollow:
-1. Users should be able to follow and unfollow other users.
-2. Users should be able to view the list of users they are following and the list of users following them.
+---
 
-### Post Creation and Retrieval:
-1. Users should be able to create new posts with text content and optional media attachments (e.g., images). 
-(Adding images is optional task)
-2. Users should be able to retrieve their own posts and posts of users they are following.
-3. Users should be able to retrieve posts by hashtags or other criteria.
+### 2. **User Profile Management**
+- **Profile Creation and Updates:**
+  - Users can create and update their profiles, including adding a profile picture, bio, and other personal details.
+- **Profile Retrieval:**
+  - Users can view their own profile and the profiles of other users.
+- **Search Users:**
+  - A search feature enables users to find others by firs_name or last_name.
 
-### Likes and Comments (Optional):
-1. Users should be able to like and unlike posts. Users should be able to view the list of posts they have liked. 
-2. Users should be able to add comments to posts and view comments on posts.
+---
 
-### Schedule Post creation using Celery (Optional):
-1. Add possibility to schedule Post creation (you can select the time to create the Post before creating of it)
+### 3. **Follow/Unfollow Functionality**
+- **Follow/Unfollow Users:**
+  - Users can follow or unfollow other users to build a social network.
+- **View Connections:**
+  - Users can view the list of people they are following and those who follow them.
 
-### API Permissions:
-1. Only authenticated users should be able to perform actions such as creating posts, 
-liking posts, and following/unfollowing users.
-2. Users should only be able to update and delete their own posts and comments.
-3. Users should only be able to update and delete their own profile.
+---
 
-### API Documentation:
-1. The API should be well-documented with clear instructions on how to use each endpoint.
-2. The documentation should include sample API requests and responses for different endpoints.
+### 4. **Post Creation and Retrieval**
+- **Post Creation:**
+  - Users can create posts with text content. Optional media attachments, such as images, can also be added.
+- **Retrieve Posts:**
+  - Users can retrieve their own posts or posts from users they follow.
+- **Hashtag Search:**
+  - Posts can be filtered and retrieved using hashtags or specific search criteria.
+
+---
+
+### 5. **Likes and Comments (Optional)**
+- **Like/Unlike Posts:**
+  - Users can like and unlike posts. A list of liked posts is available for viewing.
+- **Comment on Posts:**
+  - Users can add comments to posts and view the comment threads.
+
+---
+
+### 6. **API Permissions and Security**
+- **Action Restrictions:**
+  - Only authenticated users can perform actions like creating posts, following users, liking posts, and commenting.
+- **Ownership Control:**
+  - Users can update or delete only their own posts, comments, and profiles.
+- **Token-Based Authentication:**
+  - Ensures secure access to API endpoints.
+
+---
+
+### 7. **API Documentation**
+- **Comprehensive Documentation:**
+  - The API is fully documented with clear instructions for each endpoint.
 
 ### Technical Requirements:
-1. Use Django and Django REST framework to build the API.
-2. Use token-based authentication for user authentication.
-3. Use appropriate serializers for data validation and representation.
-4. Use appropriate views and viewsets for handling CRUD operations on models.
-5. Use appropriate URL routing for different API endpoints.
-6. Use appropriate permissions and authentication classes to implement API permissions.
-7. Follow best practices for RESTful API design and documentation.
+1. Django and Django REST framework to build the API.
+2. Token-based authentication for user authentication.
+3. Used serializers for data validation and representation.
+4. Used views and viewsets for handling CRUD operations on models.
+5. Used URL routing for different API endpoints.
+6. Used default and custom permissions and authentication classes to implement API permissions.
+7. Implemented design and documentation RESTful API by Swagger.
 
-Note: You are not required to implement a frontend interface for this task. 
-Focus on building a well-structured and well-documented RESTful API using Django and Django REST framework. 
-This task will test the junior DRF developer's skills in building RESTful APIs, 
-handling authentication and permissions, working with models, serializers, views, and viewsets, 
-and following best practices for API design and documentation.
+
+## Installation
+
+Follow these steps to set up and run the project locally:
+
+- Clone the repository to your local machine:
+```bash
+git clone https://github.com/your-username/social-media-api.git
+cd social-media-api
+```
+- Create a virtual environment for Python dependencies:
+```bash
+python -m venv venv
+```
+- Activate the virtual environment:
+```bash
+venv\Scripts\activate #for Windows
+source venv/bin/activate #for macOS/Linux
+```
+- Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+- Copy .env.sample > .env and populate with all required data
+- run migrations
+```bash
+python manage.py migrate
+```
+- Create an admin account for the Django admin panel:
+```bash
+python manage.py createsuperuser
+```
+- Start the Django development server:
+```bash
+python manage.py runserver
+```
